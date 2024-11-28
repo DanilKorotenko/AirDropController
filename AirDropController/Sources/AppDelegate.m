@@ -6,7 +6,6 @@
 //
 
 #import "AppDelegate.h"
-#import "AirDropController.h"
 
 @interface AppDelegate ()
 
@@ -19,7 +18,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-
+    [AirDropController shared];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
@@ -40,6 +39,12 @@
 #pragma mark -
 
 - (void)awakeFromNib
+{
+    [AirDropController shared].delegate = self;
+    [self updateAirDropControl];
+}
+
+- (void)updateAirDropControl
 {
     switch ([AirDropController shared].state)
     {
@@ -88,5 +93,10 @@
 }
 
 #pragma mark -
+
+- (void)airDropStateDidUpdate
+{
+    [self updateAirDropControl];
+}
 
 @end

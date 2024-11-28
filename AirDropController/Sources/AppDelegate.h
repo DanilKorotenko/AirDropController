@@ -6,8 +6,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "AirDropController.h"
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, AirDropControllerDelegate>
 
 
 @end

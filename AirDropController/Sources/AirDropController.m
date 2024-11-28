@@ -7,7 +7,18 @@
 
 #import "AirDropController.h"
 
+@interface AirDropController ()
+
+@property (assign) dispatch_source_t source;
+@property (strong) dispatch_queue_t queue;
+
+@property (assign) int fileDescriptor;
+
+@end
+
 @implementation AirDropController
+
+@synthesize state = _state;
 
 + (AirDropController *)shared
 {
@@ -16,21 +27,154 @@
     dispatch_once(&onceToken,
     ^{
         shared = [[AirDropController alloc] init];
+        [shared startMonitoring];
     });
     return shared;
 }
 
-- (AirDropState)state
+- (instancetype)init
 {
-    return AirDropStateOff;
+    self = [super init];
+    if (self)
+    {
+    }
+    return self;
 }
 
-- (void)setState:(AirDropState)state
+- (void)dealloc
 {
+    if (self.source)
+    {
+        dispatch_source_cancel(self.source);
+        self.source = nil;
+    }
 
+    if (self.fileDescriptor)
+    {
+        close(self.fileDescriptor);
+    }
 }
 
 #pragma mark -
+
+- (AirDropState)state
+{
+    return [AirDropController stringToState:[self sharingDDiscoverableMode]];
+}
+
+- (void)setState:(AirDropState)aState
+{
+    _state = aState;
+}
+
+#pragma mark -
+
+- (void)startMonitoring
+{
+    NSString *sharingDPreferencesFile = [NSString  stringWithFormat:@"%@/Library/Preferences/com.apple.sharingd.plist", NSHomeDirectory()];
+
+    self.fileDescriptor = open(sharingDPreferencesFile.UTF8String, O_EVTONLY);
+    if (self.fileDescriptor == -1)
+    {
+        return;
+    }
+
+    self.queue = dispatch_queue_create("AirDropController.Queue", DISPATCH_QUEUE_SERIAL);
+//    dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, fd,
+//        DISPATCH_VNODE_DELETE | DISPATCH_VNODE_WRITE | DISPATCH_VNODE_EXTEND| DISPATCH_VNODE_RENAME | DISPATCH_VNODE_REVOKE,
+//        queue);
+    dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, self.fileDescriptor,
+        DISPATCH_VNODE_DELETE |
+        DISPATCH_VNODE_WRITE |
+        DISPATCH_VNODE_EXTEND |
+        DISPATCH_VNODE_ATTRIB |
+        DISPATCH_VNODE_LINK |
+        DISPATCH_VNODE_RENAME |
+        DISPATCH_VNODE_REVOKE |
+        DISPATCH_VNODE_FUNLOCK,
+        self.queue);
+
+    if (source)
+    {
+        self.source = source;
+
+        // Install the event handler to process the name change
+        dispatch_source_set_event_handler(source,
+        ^{
+            dispatch_source_vnode_flags_t event = dispatch_source_get_data(self.source);
+
+            if (((event | DISPATCH_VNODE_DELETE) == DISPATCH_VNODE_DELETE) ||
+                ((event | DISPATCH_VNODE_RENAME) == DISPATCH_VNODE_RENAME) ||
+                ((event | DISPATCH_VNODE_REVOKE) == DISPATCH_VNODE_REVOKE))
+            {
+                // Close the existing file descriptor
+                close(self.fileDescriptor);
+
+                // Stop the current dispatch source
+                dispatch_source_cancel(self.source);
+                self.source = nil;
+
+                if (self.delegate)
+                {
+                    [self.delegate airDropStateDidUpdate];
+                }
+
+                [self startMonitoring];
+            }
+            else
+            {
+                if (self.delegate)
+                {
+                    [self.delegate airDropStateDidUpdate];
+                }
+            }
+        });
+
+        // Install a cancellation handler to free the descriptor
+        // and the stored string.
+        dispatch_source_set_cancel_handler(source,
+        ^{
+            close(self.fileDescriptor);
+            [self startMonitoring];
+        });
+ 
+        // Start processing events.
+        dispatch_resume(source);
+    }
+    else
+    {
+        close(self.fileDescriptor);
+    }
+}
+
+- (void)syncroniseAirDropState
+{
+    NSUserDefaults *sharingDPreferences = [[NSUserDefaults alloc] initWithSuiteName:@"com.apple.sharingd"];
+    NSString *stateString = [AirDropController stateToString:_state];
+
+    [sharingDPreferences setObject:stateString forKey:@"DiscoverableMode"];
+    [sharingDPreferences synchronize];
+
+    [self restartSharingd];
+}
+
+- (void)restartSharingd
+{
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/usr/bin/killall"];
+
+    [task setArguments:@[@"sharingd"]];
+
+    [task launch];
+    [task waitUntilExit];
+}
+
+- (NSString *)sharingDDiscoverableMode
+{
+    NSUserDefaults *sharingDPreferences = [[NSUserDefaults alloc] initWithSuiteName:@"com.apple.sharingd"];
+    NSString *result = [sharingDPreferences stringForKey:@"DiscoverableMode"];
+    return result;
+}
 
 + (NSString *)stateToString:(AirDropState)aState
 {

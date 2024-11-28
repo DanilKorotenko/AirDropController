@@ -16,11 +16,20 @@ typedef NS_ENUM(NSUInteger, AirDropState)
     AirDropStateEveryone,
 };
 
+@protocol AirDropControllerDelegate <NSObject>
+
+@required
+- (void)airDropStateDidUpdate;
+
+@end
+
 @interface AirDropController : NSObject
 
 + (AirDropController *)shared;
 
 @property(readwrite) AirDropState state;
+
+@property(weak) id<AirDropControllerDelegate> delegate;
 
 @end
 
