@@ -6,17 +6,25 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DA7FAB722CF8821800743193 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA7FAB6D2CF8821800743193 /* Assets.xcassets */; };
+		DA7FAB732CF8821800743193 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA7FAB702CF8821800743193 /* MainMenu.xib */; };
+		DA7FAB742CF8821800743193 /* AirDropController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7FAB6A2CF8821800743193 /* AirDropController.m */; };
+		DA7FAB752CF8821800743193 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7FAB6C2CF8821800743193 /* AppDelegate.m */; };
+		DA7FAB762CF8821800743193 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7FAB6E2CF8821800743193 /* main.m */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		DA7FAB432CF87D7700743193 /* AirDropController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AirDropController.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA7FAB682CF8821800743193 /* AirDropController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AirDropController.h; sourceTree = "<group>"; };
+		DA7FAB692CF8821800743193 /* AirDropController.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AirDropController.entitlements; sourceTree = "<group>"; };
+		DA7FAB6A2CF8821800743193 /* AirDropController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AirDropController.m; sourceTree = "<group>"; };
+		DA7FAB6B2CF8821800743193 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		DA7FAB6C2CF8821800743193 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		DA7FAB6D2CF8821800743193 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DA7FAB6E2CF8821800743193 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		DA7FAB6F2CF8821800743193 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		DA7FAB452CF87D7700743193 /* AirDropController */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = AirDropController;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		DA7FAB402CF87D7700743193 /* Frameworks */ = {
@@ -32,7 +40,7 @@
 		DA7FAB3A2CF87D7700743193 = {
 			isa = PBXGroup;
 			children = (
-				DA7FAB452CF87D7700743193 /* AirDropController */,
+				DA7FAB712CF8821800743193 /* AirDropController */,
 				DA7FAB442CF87D7700743193 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +51,29 @@
 				DA7FAB432CF87D7700743193 /* AirDropController.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DA7FAB712CF8821800743193 /* AirDropController */ = {
+			isa = PBXGroup;
+			children = (
+				DA7FAB772CF8822B00743193 /* Sources */,
+				DA7FAB692CF8821800743193 /* AirDropController.entitlements */,
+				DA7FAB6D2CF8821800743193 /* Assets.xcassets */,
+				DA7FAB702CF8821800743193 /* MainMenu.xib */,
+			);
+			path = AirDropController;
+			sourceTree = "<group>";
+		};
+		DA7FAB772CF8822B00743193 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				DA7FAB682CF8821800743193 /* AirDropController.h */,
+				DA7FAB6A2CF8821800743193 /* AirDropController.m */,
+				DA7FAB6B2CF8821800743193 /* AppDelegate.h */,
+				DA7FAB6C2CF8821800743193 /* AppDelegate.m */,
+				DA7FAB6E2CF8821800743193 /* main.m */,
+			);
+			path = Sources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,9 +90,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				DA7FAB452CF87D7700743193 /* AirDropController */,
 			);
 			name = AirDropController;
 			packageProductDependencies = (
@@ -108,6 +136,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA7FAB722CF8821800743193 /* Assets.xcassets in Resources */,
+				DA7FAB732CF8821800743193 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,10 +148,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA7FAB742CF8821800743193 /* AirDropController.m in Sources */,
+				DA7FAB752CF8821800743193 /* AppDelegate.m in Sources */,
+				DA7FAB762CF8821800743193 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		DA7FAB702CF8821800743193 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA7FAB6F2CF8821800743193 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		DA7FAB512CF87D7800743193 /* Debug */ = {
