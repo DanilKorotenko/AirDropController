@@ -9,7 +9,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, AirDropState)
+{
+    AirDropStateOff = 0,
+    AirDropStateContactsOnly,
+    AirDropStateEveryone,
+};
+
 @interface AirDropController : NSObject
+
++ (AirDropController *)shared;
+
+@property(readwrite) AirDropState state;
 
 @end
 
