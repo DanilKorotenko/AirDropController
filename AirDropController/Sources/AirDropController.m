@@ -9,7 +9,7 @@
 
 @interface AirDropController ()
 
-@property (assign) dispatch_source_t source;
+@property (strong) dispatch_source_t source;
 @property (strong) dispatch_queue_t queue;
 
 @property (assign) int fileDescriptor;
@@ -65,6 +65,7 @@
 - (void)setState:(AirDropState)aState
 {
     _state = aState;
+    [self syncroniseAirDropState];
 }
 
 #pragma mark -
@@ -83,7 +84,7 @@
 //    dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, fd,
 //        DISPATCH_VNODE_DELETE | DISPATCH_VNODE_WRITE | DISPATCH_VNODE_EXTEND| DISPATCH_VNODE_RENAME | DISPATCH_VNODE_REVOKE,
 //        queue);
-    dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, self.fileDescriptor,
+    self.source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, self.fileDescriptor,
         DISPATCH_VNODE_DELETE |
         DISPATCH_VNODE_WRITE |
         DISPATCH_VNODE_EXTEND |
@@ -94,12 +95,10 @@
         DISPATCH_VNODE_FUNLOCK,
         self.queue);
 
-    if (source)
+    if (self.source)
     {
-        self.source = source;
-
         // Install the event handler to process the name change
-        dispatch_source_set_event_handler(source,
+        dispatch_source_set_event_handler(self.source,
         ^{
             dispatch_source_vnode_flags_t event = dispatch_source_get_data(self.source);
 
@@ -132,14 +131,14 @@
 
         // Install a cancellation handler to free the descriptor
         // and the stored string.
-        dispatch_source_set_cancel_handler(source,
+        dispatch_source_set_cancel_handler(self.source,
         ^{
             close(self.fileDescriptor);
             [self startMonitoring];
         });
  
         // Start processing events.
-        dispatch_resume(source);
+        dispatch_resume(self.source);
     }
     else
     {
