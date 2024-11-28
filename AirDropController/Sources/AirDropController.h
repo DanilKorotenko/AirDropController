@@ -28,6 +28,7 @@ typedef NS_ENUM(NSUInteger, AirDropState)
 + (AirDropController *)shared;
 
 @property(readwrite) AirDropState state;
+@property(readwrite) BOOL enabled;
 
 @property(weak) id<AirDropControllerDelegate> delegate;
 

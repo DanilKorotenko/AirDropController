@@ -19,6 +19,7 @@
 @implementation AirDropController
 
 @synthesize state = _state;
+@synthesize enabled = _enabled;
 
 + (AirDropController *)shared
 {
@@ -27,7 +28,7 @@
     dispatch_once(&onceToken,
     ^{
         shared = [[AirDropController alloc] init];
-        [shared startMonitoring];
+        [shared startMonitoringSharingDPreferences];
     });
     return shared;
 }
@@ -37,6 +38,7 @@
     self = [super init];
     if (self)
     {
+        self.queue = dispatch_queue_create("AirDropController.Queue", DISPATCH_QUEUE_SERIAL);
     }
     return self;
 }
@@ -68,11 +70,23 @@
     [self syncroniseAirDropState];
 }
 
+- (BOOL)enabled
+{
+    return [self networkBrowserDisableAirDrop];
+}
+
+- (void)setEnabled:(BOOL)anEnabled
+{
+    _enabled = anEnabled;
+    [self synchroniseEnabled];
+}
+
 #pragma mark -
 
-- (void)startMonitoring
+- (void)startMonitoringSharingDPreferences
 {
-    NSString *sharingDPreferencesFile = [NSString  stringWithFormat:@"%@/Library/Preferences/com.apple.sharingd.plist", NSHomeDirectory()];
+    NSString *sharingDPreferencesFile = [NSString
+        stringWithFormat:@"%@/Library/Preferences/com.apple.sharingd.plist", NSHomeDirectory()];
 
     self.fileDescriptor = open(sharingDPreferencesFile.UTF8String, O_EVTONLY);
     if (self.fileDescriptor == -1)
@@ -80,10 +94,6 @@
         return;
     }
 
-    self.queue = dispatch_queue_create("AirDropController.Queue", DISPATCH_QUEUE_SERIAL);
-//    dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, fd,
-//        DISPATCH_VNODE_DELETE | DISPATCH_VNODE_WRITE | DISPATCH_VNODE_EXTEND| DISPATCH_VNODE_RENAME | DISPATCH_VNODE_REVOKE,
-//        queue);
     self.source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, self.fileDescriptor,
         DISPATCH_VNODE_DELETE |
         DISPATCH_VNODE_WRITE |
@@ -118,7 +128,7 @@
                     [self.delegate airDropStateDidUpdate];
                 }
 
-                [self startMonitoring];
+                [self startMonitoringSharingDPreferences];
             }
             else
             {
@@ -134,7 +144,7 @@
         dispatch_source_set_cancel_handler(self.source,
         ^{
             close(self.fileDescriptor);
-            [self startMonitoring];
+            [self startMonitoringSharingDPreferences];
         });
  
         // Start processing events.
@@ -197,6 +207,37 @@
         return AirDropStateEveryone;
     }
     return AirDropStateOff;
+}
+
+#pragma mark -
+
+- (BOOL)networkBrowserDisableAirDrop
+{
+    NSUserDefaults *preferences = [[NSUserDefaults alloc] initWithSuiteName:@"com.apple.NetworkBrowser"];
+    BOOL result = ![preferences boolForKey:@"DisableAirDrop"];
+    return result;
+}
+
+- (void)restartFinder
+{
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/usr/bin/killall"];
+
+    [task setArguments:@[@"Finder"]];
+
+    [task launch];
+    [task waitUntilExit];
+}
+
+- (void)synchroniseEnabled
+{
+    NSUserDefaults *preferences = [[NSUserDefaults alloc] initWithSuiteName:@"com.apple.NetworkBrowser"];
+
+    [preferences setBool:!_enabled forKey:@"DisableAirDrop"];
+    [preferences synchronize];
+
+    [self restartFinder];
+    [self restartSharingd];
 }
 
 @end

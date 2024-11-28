@@ -11,6 +11,7 @@
 
 @property (strong) IBOutlet NSWindow *window;
 @property (strong) IBOutlet NSSegmentedControl *airDropStateControl;
+@property (strong) IBOutlet NSButton *enabledChackBox;
 
 @end
 
@@ -46,6 +47,8 @@
 
 - (void)updateAirDropControl
 {
+    self.enabledChackBox.state = [AirDropController shared].enabled ? NSControlStateValueOn : NSControlStateValueOff;
+
     switch ([AirDropController shared].state)
     {
         case AirDropStateOff:
@@ -67,6 +70,11 @@
 }
 
 #pragma mark -
+
+- (IBAction)enabledDidClick:(id)sender
+{
+    [AirDropController shared].enabled = self.enabledChackBox.state == NSControlStateValueOn;
+}
 
 - (IBAction)airDropStateControlDidClick:(id)sender
 {
