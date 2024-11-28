@@ -14,19 +14,50 @@
 
 @implementation AppDelegate
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+
 }
 
+- (void)applicationWillTerminate:(NSNotification *)aNotification
+{
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
 }
 
-
-- (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)app {
+- (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)app
+{
     return YES;
 }
 
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender
+{
+    return YES;
+}
+
+#pragma mark -
+
+- (IBAction)airDropStateControlDidClick:(id)sender
+{
+    NSSegmentedControl *segmentedControl = (NSSegmentedControl *)sender;
+    switch (segmentedControl.selectedSegment)
+    {
+        case 0: // Off
+        {
+            break;
+        }
+        case 1: // Contacts Only
+        {
+            break;
+        }
+        case 2: // Everyone
+        {
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+#pragma mark -
 
 @end
